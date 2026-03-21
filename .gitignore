@@ -1,0 +1,29 @@
+# Ignore everything by default
+*
+
+# Track configuration
+!.gitignore
+!CLAUDE.md
+!settings.json
+
+# Track custom agents
+!agents/
+!agents/**
+
+# Track custom skills (not symlinks)
+!skills/
+!skills/*/
+!skills/**/SKILL.md
+
+# Track custom commands
+!commands/
+!commands/**
+
+# Track plugin configs (not caches)
+!plugins/
+!plugins/config.json
+!plugins/claude-hud/
+!plugins/claude-hud/config.json
+
+# Ignore all .DS_Store files
+.DS_Store
