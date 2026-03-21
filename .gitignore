@@ -10,10 +10,9 @@
 !agents/
 !agents/**
 
-# Track custom skills (not symlinks)
+# Track custom skills
 !skills/
-!skills/*/
-!skills/**/SKILL.md
+!skills/**
 
 # Track custom commands
 !commands/
