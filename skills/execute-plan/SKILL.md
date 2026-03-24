@@ -1,11 +1,11 @@
 ---
 name: execute-plan
-description: 'Execute a plan document using an agent team. Use when asked to "execute a plan", "run this plan", "implement this plan", or given a plan file to carry out. Delegates work to teammates with flexible agent-to-task mapping optimized for context efficiency.'
+description: 'Execute a plan document using an agent team. Use when asked to "execute a plan", "run this plan", "implement this plan", or given a plan file to carry out. The main agent delegates all work to teammates and does not implement directly.'
 ---
 
 # Execute Plan
 
-Disciplined execution of a plan document using an agent team. The main agent delegates all implementation work and does not implement directly.
+Disciplined execution of a plan document using an agent team. The main agent acts as team lead — it delegates all implementation work and does not write code or make changes directly.
 
 ## When to Use This Skill
 
@@ -17,45 +17,50 @@ Disciplined execution of a plan document using an agent team. The main agent del
 
 ### 1. Read the Plan
 
-- Parse the plan file provided by the user
+- Parse the plan file provided by the user (if no path given, ask for it)
 - Identify all discrete tasks described in the plan
 - If the plan is ambiguous or missing details, ask clarifying questions before proceeding
 
 ### 2. Git Safety
 
-- Verify the current branch is NOT `main`
-- If on `main`, confirm with the user before creating a new branch
-- If already on a feature branch, proceed
+Verify the current branch is NOT `main` or `master`:
+```bash
+git branch --show-current
+```
+If on `main` or `master`, **stop immediately** and tell the user to create a feature branch first. Do not proceed.
 
 ### 3. Create Agent Team
 
-- Always use `TeamCreate` to create an agent team
-- The main agent acts as team lead: it delegates tasks and monitors progress
-- The main agent does NOT write code or make changes directly
+Use `TeamCreate` to create a team named after the plan (e.g., `plan-<short-description>`). The main agent monitors progress and reacts to issues — it does not implement.
 
 ### 4. Plan Task Delegation
 
-Analyze the plan tasks and decide how to distribute them across agents. **The goal is context efficiency** — not a rigid 1:1 mapping of agents to tasks.
+Analyze the plan and decide how to distribute work. **The goal is context efficiency** — not a rigid 1:1 mapping of agents to tasks.
 
-**Grouping:** Assign related or sequential tasks to the same agent when they share context (e.g., same module, same feature area, one builds on another). This avoids redundant context-building across agents.
+**Grouping:** Assign related or sequential tasks to the same agent when they share context (same module, same feature area, one builds on another).
 
-**Splitting:** When a single task is large or has clearly independent sub-parts, split it across multiple agents so each can work with focused scope.
+**Splitting:** When a single task is large or has clearly independent sub-parts, split it across multiple agents.
 
 **Parallelizing:** Assign independent tasks to separate agents so they run concurrently.
 
 **Sub-teams:** Teammates may spawn their own sub-teams when their assigned work is complex enough to benefit from further delegation.
 
+**Shared state:** Tasks that touch the same files should go to the same agent to avoid merge conflicts.
+
 Decision guide:
 - Simple related tasks → group on one agent
 - Independent tasks → parallelize across agents
-- Large complex task → split across multiple agents, or let the agent spawn a sub-team
-- Tasks with shared files/state → same agent (avoid merge conflicts)
+- Large complex task → split across agents or let the agent spawn a sub-team
+- Tasks with shared files/state → same agent
+
+**Agent types:** Check `~/.claude/agents/` for domain-specific agents. Use a matching agent's `subagent_type` when one fits the work. Fall back to `general-purpose` when no specific agent applies.
 
 ### 5. Create and Assign Tasks
 
-- Create tasks from the plan, grouping or splitting as decided in step 4
-- Set up task dependencies where order matters (use `addBlockedBy`)
-- Spawn teammates and assign tasks via `TaskUpdate`
+- Use `TaskCreate` for each task, setting up `addBlockedBy` dependencies where order matters
+- Copy the full task text directly into each teammate's prompt — **never make teammates read the plan file themselves**
+- Use `~/.claude/skills/execute-plan/teammate-prompt.md` as the template for structuring teammate prompts
+- Use `TaskUpdate` to assign tasks to teammates
 
 ### 6. Strict Scope
 
@@ -65,14 +70,42 @@ Decision guide:
 
 ### 7. Commits
 
-- Each teammate commits its changes when its assigned work is complete
-- Use the `format-commit` skill conventions for commit messages
+- Each teammate makes exactly **one commit** covering all their assigned work
 - Teammates must run `make lint` and `make test` before committing (if the project has these commands)
+- Commit messages should clearly describe what was implemented
 
-### 8. Summary
+### 8. Monitor Progress
 
-- After all tasks are complete, shut down the team
-- Present a summary to the user:
-  - List of commits made (hash + message)
-  - Files changed
-  - Any issues encountered or scope items deferred
+Track teammate progress through:
+- Automatic message delivery from teammates
+- `TaskList` to check overall status
+- React to any issues or blockers teammates report — reassign work if needed
+
+### 9. Cleanup & Summary
+
+Shut down all teammates with `SendMessage` type `shutdown_request`, then use `TeamDelete` to clean up the team.
+
+Present a final summary:
+
+```
+## Execution Summary
+
+### Tasks Completed
+- [ ] Task 1: <title> — commit `<sha>` — files: <list>
+- [ ] Task 2: <title> — commit `<sha>` — files: <list>
+
+### Issues Encountered
+- <any problems, deviations, or deferred scope>
+
+### Files Changed
+<consolidated list of all files changed across all tasks>
+```
+
+## Key Constraints
+
+- **The main agent does not write code** — delegate everything to teammates
+- **Execute ONLY what the plan describes** — no added features, refactors, or improvements
+- **One commit per teammate** — covers all their assigned work
+- **Never execute on main/master** — always require a feature branch
+- **Copy task text into prompts** — never make teammates read the plan file themselves
+- **Respect dependencies** — tasks with blockers wait before starting

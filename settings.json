@@ -1,6 +1,8 @@
 {
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "true"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "true",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "false",
+    "ENABLE_TOOL_SEARCH": "1"
   },
   "permissions": {
     "allow": [
@@ -8,50 +10,94 @@
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(go mod tidy:*)",
+      "WebFetch(domain:tanstack.com)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(xargs:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
       "Bash(go build:*)",
+      "Bash(go generate:*)",
+      "Bash(go get:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(go run:*)",
+      "Bash(go test:*)",
+      "Bash(make generate:*)",
+      "Bash(make migrateup:*)",
       "Bash(npm create:*)",
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(tree:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
+      "Bash(npx tsc:*)",
+      "Bash(bun run build:*)",
+      "Bash(bun run tsc:*)",
+      "Bash(bun run typecheck:*)",
+      "Bash(bun tsc:*)",
+      "Bash(bun vite build:*)",
+      "Bash(bunx:*)",
+      "Bash(bunx shadcn@latest add popover:*)",
+      "Bash(pnpm dlx:*)",
+      "Bash(tsc:*)",
       "Bash(docker ps:*)",
       "Bash(docker exec:*)",
       "Bash(defaults read:*)",
       "Bash(gh repo view:*)",
-      "Bash(gh issue list:*)"
+      "Bash(gh issue list:*)",
+      "Skill(frontend-design)",
+      "Skill(commit-commands:commit)"
     ],
     "defaultMode": "default"
   },
-  "hooks": {},
+  "hooks": {
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/ryanhill/.config/agent-metrics/hooks/session-summary.sh"
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
     "type": "command",
-    "command": "bash -c '\"/Users/ryan.hill/.bun/bin/bun\" \"$(ls -td ~/.claude/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | head -1)src/index.ts\"'"
+    "command": "bash -c '\"/Users/ryanhill/.bun/bin/bun\" \"$(ls -td ~/.claude/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | head -1)src/index.ts\"'"
   },
   "enabledPlugins": {
-    "commit-commands@claude-plugins-official": false,
+    "agent-sdk-dev@claude-plugins-official": false,
+    "axiom@axiom-marketplace": false,
+    "claude-hud@claude-hud": true,
+    "claude-md-management@claude-plugins-official": true,
+    "code-review@claude-plugins-official": false,
+    "code-simplifier@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "compound-engineering@every-marketplace": false,
+    "explanatory-output-style@claude-plugins-official": false,
     "feature-dev@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
     "hookify@claude-plugins-official": false,
-    "plugin-dev@claude-plugins-official": false,
-    "code-review@claude-plugins-official": false,
-    "pr-review-toolkit@claude-plugins-official": false,
-    "typescript-lsp@claude-plugins-official": true,
-    "stripe@claude-plugins-official": false,
-    "claude-hud@claude-hud": true,
-    "agent-sdk-dev@claude-plugins-official": false,
-    "swift-lsp@claude-plugins-official": false,
-    "code-simplifier@claude-plugins-official": true,
-    "axiom@axiom-marketplace": false,
-    "superpowers@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "sentry@claude-plugins-official": true,
+    "linear@claude-plugins-official": false,
     "playground@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": false,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": false,
+    "sentry@claude-plugins-official": true,
+    "slack@claude-plugins-official": false,
+    "stripe@claude-plugins-official": false,
+    "supabase@claude-plugins-official": false,
+    "superpowers@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": false,
+    "typescript-lsp@claude-plugins-official": true,
     "vercel@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": true,
   "effortLevel": "high",
+  "alwaysThinkingEnabled": true,
+  "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true
 }
