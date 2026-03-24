@@ -21,7 +21,7 @@
 # Track plugin configs (not caches)
 !plugins/
 !plugins/config.json
-!plugins/known_marketplaces.json
+!plugins/PLUGINS.md
 !plugins/claude-hud/
 !plugins/claude-hud/config.json
 
